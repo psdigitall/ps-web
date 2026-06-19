@@ -162,4 +162,27 @@
       setInterval(advance, 3800);
     }
   }
+
+  /* ---------- 6) Dvojbodka ZA kartou ----------
+     Podľa dizajnu je dvojbodka vertikálne vycentrovaná na kartu a jej pravá
+     časť je schovaná za ľavým okrajom karty (karta je navrchu). Polohu rátame
+     z reálnej pozície karty, aby sedela na každej šírke obrazovky. */
+  const colon = document.querySelector(".work__colon");
+  const colonStage = document.querySelector(".work__stage");
+  const colonCard = document.querySelector(".work__viewport");
+  if (colon && colonStage && colonCard) {
+    const TUCK = 0.6; // koľko šírky dvojbodky je schovaných za kartou
+    const placeColon = () => {
+      const w = colon.offsetWidth;
+      if (!w) return;
+      const s = colonStage.getBoundingClientRect();
+      const c = colonCard.getBoundingClientRect();
+      // ľavá hrana dvojbodky tak, aby jej pravá hrana bola TUCK*w za okrajom karty
+      colon.style.left = (c.left - s.left) - w * (1 - TUCK) + "px";
+    };
+    if (colon.complete) placeColon();
+    colon.addEventListener("load", placeColon);
+    window.addEventListener("load", placeColon);
+    window.addEventListener("resize", placeColon);
+  }
 })();
