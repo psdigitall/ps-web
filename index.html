@@ -45,9 +45,13 @@
         <video
           class="hero__video"
           poster="assets/img/hero-poster.png"
-          autoplay muted loop playsinline preload="auto">
+          autoplay muted loop playsinline webkit-playsinline preload="auto">
           <source src="assets/video/showreel.mp4" type="video/mp4" />
         </video>
+        <!-- Zobrazí sa len ak prehliadač zablokuje autoplay (napr. úsporný režim) -->
+        <button class="hero__play" type="button" aria-label="Prehrať video" hidden>
+          <span class="hero__play-icon"></span>
+        </button>
       </div>
     </section>
 

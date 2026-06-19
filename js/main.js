@@ -23,20 +23,49 @@
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") toggle(false); });
   }
 
-  /* ---------- 2) Showreel video – autoplay pri načítaní ----------
-     Komentár grafika: „Showreel video, automaticky sa spustí pri načítaní webu." */
+  /* ---------- 2) Showreel video – autoplay + fallback ----------
+     Komentár grafika: „Showreel video, automaticky sa spustí pri načítaní webu."
+     Autoplay môže politika prehliadača zablokovať (úsporný režim, prísne nastavenia),
+     preto skúšame na viacerých miestach, pri prvej interakcii, a inak ukážeme Prehrať. */
   const video = document.querySelector(".hero__video");
+  const playBtn = document.querySelector(".hero__play");
   if (video) {
-    const tryPlay = () => {
+    // Stlmenie aj ako property (nie len atribút) – niektoré prehliadače to vyžadujú.
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+
+    const showBtn = () => { if (playBtn) playBtn.hidden = false; };
+    const hideBtn = () => { if (playBtn) playBtn.hidden = true; };
+    const attempt = () => {
+      if (!video.paused) return;            // už hrá – nič nerob
       const p = video.play();
-      if (p && typeof p.catch === "function") {
-        // Niektoré prehliadače blokujú autoplay – poster zostane viditeľný.
-        p.catch(() => {});
+      if (p && typeof p.then === "function") {
+        p.then(hideBtn).catch(showBtn);     // úspech skryje tlačidlo, zlyhanie ho ukáže
       }
     };
-    if (video.readyState >= 2) tryPlay();
-    video.addEventListener("canplay", tryPlay, { once: true });
-    window.addEventListener("load", tryPlay, { once: true });
+
+    if (video.readyState >= 2) attempt();
+    ["loadeddata", "canplay"].forEach((ev) => video.addEventListener(ev, attempt));
+    window.addEventListener("load", attempt, { once: true });
+
+    // Fallback: spusti pri prvej interakcii kdekoľvek (scroll/dotyk/klik/klávesa).
+    ["pointerdown", "touchstart", "keydown", "scroll"].forEach((ev) =>
+      window.addEventListener(ev, attempt, { once: true, passive: true })
+    );
+
+    // Explicitné tlačidlo Prehrať (klik = istá používateľská interakcia).
+    if (playBtn) playBtn.addEventListener("click", attempt);
+
+    // Šetrenie dát/batérie: pauza mimo obrazovky, prehrávanie keď je vidno.
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) attempt();
+          else if (!video.paused) video.pause();
+        });
+      }, { threshold: 0.25 }).observe(video);
+    }
   }
 
   /* ---------- 3) Novinky – „slot machine" reel ----------

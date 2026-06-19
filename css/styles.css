@@ -108,6 +108,7 @@ strong { font-weight: 700; }
 /* ============ HERO / SHOWREEL ============ */
 .hero { padding: 4px var(--pad) 0; }
 .hero__media {
+  position: relative;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: var(--ps-azure);
@@ -117,6 +118,38 @@ strong { font-weight: 700; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* tlačidlo Prehrať – viditeľné len keď autoplay zlyhá (JS odstráni [hidden]) */
+.hero__play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  cursor: pointer;
+  background: rgba(0, 65, 101, .28);
+  transition: background .2s ease;
+}
+.hero__play[hidden] { display: none; }
+.hero__play:hover { background: rgba(0, 65, 101, .4); }
+.hero__play-icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ps-yellow);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+}
+.hero__play-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 12px 0 12px 20px;
+  border-color: transparent transparent transparent var(--ps-blue);
 }
 
 /* ============ INTRO ============ */
